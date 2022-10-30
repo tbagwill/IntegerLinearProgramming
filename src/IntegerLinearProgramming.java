@@ -39,15 +39,17 @@ public class IntegerLinearProgramming {
         ** | a02 * x0 , a12 * x1 , a22 * x2 |
         */
 
-        /* STEP 2: b = ax + s -> 
+        /* STEP 2: b = ax + s -> // (b - s) = Ax || (b - s)A^-1 = x
          * 
          * 
          */
 
         // TODO: shortcut method ( determinant of a matrix )
-        // TODO: 
 
-        // b = ax + s
+        // TODO: adjucate of matrix
+
+        // TODO: inverse of the matrix using A^-1 = adjucate( A ) * ( 1 / determinate(A) )
+
 
         // System.out.println(x.toString());
     }
@@ -80,31 +82,7 @@ public class IntegerLinearProgramming {
         s.elementAt(0).addElement(1.0);
     }
 
-    public static void step1( Vector < Vector < Double > > a, Vector < Vector < Double > > b, Vector < Vector < Double > > s, Vector < Vector < Double > > x ){
-        // if a[cols] != x[rows]
-        if( a.size() != x.elementAt(0).size() ){
-            System.out.println( "Invalid matrix dimensions.");
-            return;
-        }
-        // b = Ax + s
-
-        // b - s
-        Vector < Vector < Double > > bs = new Vector < Vector < Double > > ();
-        // cols (1)
-        for( int i = 0; i < b.size(); i++ ){
-            // add row
-            bs.add( new Vector < Double > () );
-            // iter rows (base case: 3)
-            for( int j = 0; j < b.elementAt(i).size(); j++ ){
-
-                bs.elementAt(i).add( b.elementAt(i).elementAt(j) - s.elementAt(i).elementAt(j) );
-
-            }
-        }
-
-        // (b - s) = Ax || (b - s)A^-1 = x
         
-    }
 
     public static Vector < Vector < Double > > inverseMatrix( Vector < Vector < Double > > m ){
         Vector < Vector < Double > > inv = new Vector < Vector < Double > > ();
@@ -122,8 +100,6 @@ public class IntegerLinearProgramming {
             System.out.println();
         }
         System.out.println();
-    }
-
-    
+    }    
 
 }
