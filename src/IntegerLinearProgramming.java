@@ -8,42 +8,122 @@ import java.util.Vector;
 
 public class IntegerLinearProgramming {
 
+    public static final Integer col = 3;
+    public static final Integer row = 3;
+    public static Vector < Vector < Double > > x = new Vector < Vector < Double > > ();
+
     public static void main(String[] args) throws Exception {
         
         // preface
-        // init vectors ( one dimensional matrices )
+        // INIT MATRICES
 
-        Vector <Double> b = new Vector <Double> ();
-        Vector <Double> a = new Vector <Double> ();
-        Vector <Double> x = new Vector <Double> ();
-        Vector <Double> s = new Vector <Double> ();
+        Vector < Vector < Double > > b = new Vector < Vector < Double > > ();
+        Vector < Vector < Double > > a = new Vector < Vector < Double > > ();
+        Vector < Vector < Double > > s = new Vector < Vector < Double > > ();
 
-        // populate values
-        assign(a, b, s);
+        // POPULATE VALUES
+        // TODO: populate with random values 
+        pop(a, b, s);
+
+        // check matrices
+        printMatrix(a, "a");
+        printMatrix(b, "b");
+        printMatrix(s, "s");
+
+        // Given b = ax + s, where a = n*n matrix and b, x, s are n x 1 matrices
+
+        /* STEP 1: Create system of equations using ax cross product ( Ex: )
+        **
+        ** | a00 * x0 , a10 * x1 , a20 * x2 |
+        ** | a01 * x0 , a11 * x1 , a21 * x2 |
+        ** | a02 * x0 , a12 * x1 , a22 * x2 |
+        */
+
+        /* STEP 2: b = ax + s -> 
+         * 
+         * 
+         */
+
+        // TODO: shortcut method ( determinant of a matrix )
+        // TODO: 
 
         // b = ax + s
-        vectorMult(a, b, s, x);
 
-        System.out.println(x.toString());
+        // System.out.println(x.toString());
     }
 
-    public static void assign( Vector <Double> a, Vector <Double> b, Vector <Double> s ){
-        b.addElement(5.0);
-        b.addElement(12.9);
-        b.addElement(2.0);
-        a.addElement(4.25);
-        a.addElement(1.1);
-        a.addElement(0.97);
-        s.addElement(3.7);
-        s.addElement(3.8);
-        s.addElement(1.0);
+    public static void pop( Vector < Vector < Double > > a, Vector < Vector < Double > > b, Vector < Vector < Double > > s ) {
+        // populate a
+        a.addElement( new Vector < Double > () );
+        a.addElement( new Vector < Double > () );
+        a.addElement( new Vector < Double > () );
+        a.elementAt(0).addElement(3.2);
+        a.elementAt(0).addElement(8.7);
+        a.elementAt(0).addElement(5.9);
+        a.elementAt(1).addElement(2.4);
+        a.elementAt(1).addElement(3.1);
+        a.elementAt(1).addElement(1.1);
+        a.elementAt(2).addElement(9.7);
+        a.elementAt(2).addElement(6.1);
+        a.elementAt(2).addElement(0.3);
+        
+        // populate b
+        b.addElement( new Vector < Double > () );
+        b.elementAt(0).addElement(5.0);
+        b.elementAt(0).addElement(12.9);
+        b.elementAt(0).addElement(2.0);
+        
+        // populate s
+        s.addElement( new Vector < Double > () );
+        s.elementAt(0).addElement(3.7);
+        s.elementAt(0).addElement(3.8);
+        s.elementAt(0).addElement(1.0);
     }
 
-    public static void vectorMult( Vector <Double> a, Vector <Double> b, Vector <Double> s, Vector <Double> x ){
-        for( int i = 0; i < b.size(); i++){
-            x.addElement( (b.elementAt(i) - s.elementAt(i) ) / a.elementAt(i) );
+    public static void step1( Vector < Vector < Double > > a, Vector < Vector < Double > > b, Vector < Vector < Double > > s, Vector < Vector < Double > > x ){
+        // if a[cols] != x[rows]
+        if( a.size() != x.elementAt(0).size() ){
+            System.out.println( "Invalid matrix dimensions.");
+            return;
         }
+        // b = Ax + s
+
+        // b - s
+        Vector < Vector < Double > > bs = new Vector < Vector < Double > > ();
+        // cols (1)
+        for( int i = 0; i < b.size(); i++ ){
+            // add row
+            bs.add( new Vector < Double > () );
+            // iter rows (base case: 3)
+            for( int j = 0; j < b.elementAt(i).size(); j++ ){
+
+                bs.elementAt(i).add( b.elementAt(i).elementAt(j) - s.elementAt(i).elementAt(j) );
+
+            }
+        }
+
+        // (b - s) = Ax || (b - s)A^-1 = x
+        
     }
 
+    public static Vector < Vector < Double > > inverseMatrix( Vector < Vector < Double > > m ){
+        Vector < Vector < Double > > inv = new Vector < Vector < Double > > ();
+        
+
+        return inv;
+    }
+
+    public static void printMatrix( Vector< Vector< Double >> m, String n ) {
+        System.out.println( "--" + " Matrix " + n );
+        for ( int i = 0; i < m.size(); i++ ){
+            for (int j = 0; j < m.elementAt(i).size(); j++ ){
+                System.out.print( m.elementAt(i).elementAt(j) + "\t" );
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
+    
 
 }
