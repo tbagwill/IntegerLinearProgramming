@@ -3,7 +3,7 @@ import java.util.Vector;
 /* 
  * Integer Linear Programming
  * CSC 414 Midterm Project
- * Tyler Bagwill, Nathan Bonetto, Kaeleb Brandin, Judah Lopez 
+ * Tyler Bagwill, Nathan Bonetto, Kaeleb Brandin
 */
 
 public class IntegerLinearProgramming {
@@ -14,22 +14,6 @@ public class IntegerLinearProgramming {
 
     public static void main(String[] args) throws Exception {
         
-        // preface
-        // INIT MATRICES
-
-        Vector < Vector < Double > > b = new Vector < Vector < Double > > ();
-        Vector < Vector < Double > > a = new Vector < Vector < Double > > ();
-        Vector < Vector < Double > > s = new Vector < Vector < Double > > ();
-
-        // POPULATE VALUES
-        // TODO: populate with random values 
-        pop(a, b, s);
-
-        // check matrices
-        printMatrix(a, "a");
-        printMatrix(b, "b");
-        printMatrix(s, "s");
-
         // Given b = ax + s, where a = n*n matrix and b, x, s are n x 1 matrices
 
         /* STEP 1: Create system of equations using ax cross product ( Ex: )
@@ -39,19 +23,246 @@ public class IntegerLinearProgramming {
         ** | a02 * x0 , a12 * x1 , a22 * x2 |
         */
 
-        /* STEP 2: b = ax + s -> // (b - s) = Ax || (b - s)A^-1 = x
-         * 
-         * 
-         */
+        Vector < Vector < Double > > b = new Vector < Vector < Double > > ();
+        Vector < Vector < Double > > a = new Vector < Vector < Double > > ();
+        Vector < Vector < Double > > s = new Vector < Vector < Double > > ();
 
-        // TODO: shortcut method ( determinant of a matrix )
+        // Populate Matrices ( System of Equations )
+        pop(a, b, s);
 
-        // TODO: adjucate of matrix
+        // check matrices
+        printMatrix(a, "a");
+        printMatrix(b, "b");
+        printMatrix(s, "s");
+
+        /* STEP 2: b = ax + s -> (b - s) = Ax 
+        **
+        */
+
+        b = subtractMatrix(b, s);
+
+        /* STEP 3: A^-1 = ( 1 / det(A) ) * adj(a)
+        ** 
+        */
+
+        Vector < Vector < Double > > inv = new Vector < Vector < Double > > ();
+
+        inv = inverseMatrix( a );
+
+        /* STEP 4: (b - s) = Ax -> (b - s)A^-1 = x
+        ** 
+        */
+
+        // larger matrix first
+        x = multMatrix( inv, b );
+
+        printMatrix(x, "x");
 
         // TODO: inverse of the matrix using A^-1 = adjucate( A ) * ( 1 / determinate(A) )
 
 
         // System.out.println(x.toString());
+    }
+
+    public static Vector < Vector < Double > > multMatrix( Vector < Vector < Double > > a, Vector < Vector < Double > > b ){
+        if( a.size() != b.elementAt(0).size() ){
+            throw new IllegalArgumentException( "Invalid Matrices Dimensions." );
+        }
+        
+        Vector < Vector < Double > > res = new Vector < Vector < Double > > ();
+        double sum = 0.0;
+
+        // TODO: 3x3 * 3x1
+
+        for( int i = 0; i < b.size(); i++ ){
+            res.add( new Vector < Double > () );
+            for( int j = 0; j < a.elementAt(i).size(); j++ ){
+                for( int k = 0; k < b.elementAt(i).size(); k++ ){
+                    sum += a.elementAt(k).elementAt(j) * b.elementAt(i).elementAt(k);
+                }
+                res.elementAt(i).add( sum );
+                sum = 0;
+            }
+        }
+
+        return res;
+    }
+
+    public static Vector < Vector < Double > > subtractMatrix ( Vector < Vector < Double > > b, Vector < Vector < Double > > s ){
+        Vector < Vector < Double > > bs = new Vector < Vector < Double > > ();
+
+        for( int i = 0; i < b.size(); i++ ){
+            bs.add( new Vector < Double > () );
+            for( int j = 0; j < b.elementAt(i).size(); j++ ){
+                bs.elementAt(i).add( b.elementAt(i).elementAt(j) - s.elementAt(i).elementAt(j) );
+            }
+        }
+
+        return bs; 
+    }
+
+    public static Vector < Vector < Double > > inverseMatrix( Vector < Vector < Double > > v ){
+        Vector < Vector < Double > > inv = new Vector < Vector < Double > > ();
+        Vector < Vector < Double > > adj = new Vector < Vector < Double > > ();
+
+        adj = adjucate( v );
+
+        for( int i = 0; i < v.size(); i++ ){
+            inv.add( new Vector < Double > () );
+            for( int j = 0; j < v.elementAt(i).size(); j++ ){
+                inv.elementAt(i).add( ( 1 / determinant( v ) ) * adj.elementAt( i ).elementAt( j ) );
+            }
+        }
+
+        printMatrix(inv, "inv of a");
+
+        // Vector < Double > dot = new Vector<Double>();
+
+        // double sum;
+        // for(int i = 0; i < inv.size(); i++) {
+        //     sum = 0;
+        //     for(int j = 0; j < inv.elementAt(i).size(); j++) {
+        //         sum += bs.elementAt(i).elementAt(j) * inv.elementAt(i).elementAt(j);
+        //     }
+        //     dot.add(sum);
+        // }
+        // System.out.println(dot);
+
+        return inv;
+    }
+
+    public static Vector < Vector < Double > > adjucate( Vector < Vector < Double > > v ){
+        Vector < Vector < Double > > v2 = new Vector < Vector < Double > > ();
+
+        for( int i = 0; i < v.size(); i++){
+            v2.add( new Vector < Double > () );
+            for( int j = 0; j < v.elementAt(i).size(); j++ ){
+                v2.elementAt(i).add( cofactor( v, i, j ) );
+                if ( (i + j) % 2 == 1 ){
+                    v2.elementAt(i).set(j, v2.elementAt(i).elementAt(j) * -1.0 );
+                }
+            }
+        }
+
+        v2 = transpose( v2 );
+
+        return v2;
+    }
+
+    public static Double cofactor( Vector < Vector < Double > > v, Integer i, Integer j ){
+        Vector < Vector < Double > > v2 = new Vector < Vector < Double > > ();
+
+        // copy matrix 
+        v2 = copyMatrix( v );
+
+        // remove row
+        for( int x = 0; x < v.size(); x++ ){
+            v2.elementAt( x ).removeElementAt( j );
+        }
+
+        // remove col
+        v2.removeElementAt(i);
+
+        // debug
+        // printMatrix(v2, "null");
+
+        Double deter = determinant( v2 );
+
+        return deter;
+    }
+
+    public static Double determinant( Vector < Vector < Double > > v ){
+        // Check for square matrix
+        if( v.size() != v.elementAt(0).size() ){
+            throw new IllegalArgumentException("Determinant must come from square matrix.");
+        }
+
+        // Create matrix of n + n-1*n + n-1 
+        Vector < Vector < Double > > v2 = new Vector < Vector < Double > > ();
+        
+        // Duplicate matrix
+        v2 = copyMatrix( v );
+
+        // Expand if n > 2
+        if( v.size() > 2 ){
+            int k = 0;
+            for( int i = v.size(); i < v.size() * 2 - 1; i++ ){
+                v2.add( new Vector < Double > () );
+                for( int j = 0; j < v.elementAt(k).size(); j++ ){
+                    v2.elementAt(i).add( v.elementAt(k).elementAt(j) );
+                }
+                k++;
+            }
+
+            // init temp variables
+        Double sum1 = 0.0, temp1 = 0.0;
+        int xoffset1 = 0;
+
+        // parse matrix diagonally: top left to bottom right
+        while( xoffset1 < v2.elementAt(0).size() ){
+            temp1 = 1.0;
+            for( int i = 0; i < v2.size(); i++){
+                for( int j = 0; j < v2.elementAt(i).size(); j++ ){
+                    if( i == j + xoffset1 ){
+                        temp1 *= v2.elementAt(i).elementAt(j);
+                    }
+                }
+            }
+            sum1 += temp1;
+            xoffset1++;
+        }
+
+        // init temp variables
+        Double sum2 = 0.0, temp2 = 0.0;
+        int xoffset2 = 0;
+        // parse matrix diagonally: bottom left to top right
+        while( xoffset2 < v2.elementAt(0).size() ){
+            temp2 = 1.0;
+            for( int i = 0; i < v2.size(); i++){
+                for( int j = v2.elementAt(i).size() - 1; j >= 0; j-- ){
+                    if( i + j == ( v2.elementAt(i).size() - 1 ) + xoffset2 ){
+                        temp2 *= v2.elementAt(i).elementAt(j);
+                    }
+                }
+            }
+            sum2 += temp2;
+            xoffset2++;
+        }
+
+        return sum1 - sum2;
+
+        } else {
+            // debug
+            // printMatrix(v2, "v");
+
+            return v2.elementAt(0).elementAt(0) * v2.elementAt(1).elementAt(1) - v2.elementAt(1).elementAt(0) * v2.elementAt(0).elementAt(1);
+        }
+    }
+
+    public static Vector < Vector < Double > > transpose( Vector < Vector < Double > > v ){
+        Vector < Vector < Double > > v2 = new Vector < Vector < Double > > ();
+
+        for( int i = 0; i < v.elementAt(0).size(); i++ ){
+            v2.add( new Vector < Double > () );
+            for( int j = 0; j < v.size(); j++ ){
+                v2.elementAt(i).add( v.elementAt(j).elementAt(i) );
+            }
+        }
+
+        return v2;
+    }
+
+    public static Vector < Vector < Double > > copyMatrix( Vector < Vector < Double > > v ){
+        Vector < Vector < Double > > copy = new Vector < Vector < Double > > ();
+
+        for( int i = 0; i < v.size(); i++ ){
+            copy.add( new Vector < Double > () );
+            for( int j = 0; j < v.elementAt(i).size(); j++ ){
+                copy.elementAt(i).add( v.elementAt(i).elementAt(j) );
+            }
+        }
+        
+        return copy;
     }
 
     public static void pop( Vector < Vector < Double > > a, Vector < Vector < Double > > b, Vector < Vector < Double > > s ) {
@@ -60,13 +271,13 @@ public class IntegerLinearProgramming {
         a.addElement( new Vector < Double > () );
         a.addElement( new Vector < Double > () );
         a.elementAt(0).addElement(3.2);
-        a.elementAt(0).addElement(8.7);
-        a.elementAt(0).addElement(5.9);
-        a.elementAt(1).addElement(2.4);
+        a.elementAt(1).addElement(8.7);
+        a.elementAt(2).addElement(5.9);
+        a.elementAt(0).addElement(2.4);
         a.elementAt(1).addElement(3.1);
-        a.elementAt(1).addElement(1.1);
-        a.elementAt(2).addElement(9.7);
-        a.elementAt(2).addElement(6.1);
+        a.elementAt(2).addElement(1.1);
+        a.elementAt(0).addElement(9.7);
+        a.elementAt(1).addElement(6.1);
         a.elementAt(2).addElement(0.3);
         
         // populate b
@@ -82,20 +293,16 @@ public class IntegerLinearProgramming {
         s.elementAt(0).addElement(1.0);
     }
 
-        
-
-    public static Vector < Vector < Double > > inverseMatrix( Vector < Vector < Double > > m ){
-        Vector < Vector < Double > > inv = new Vector < Vector < Double > > ();
-        
-
-        return inv;
-    }
-
-    public static void printMatrix( Vector< Vector< Double >> m, String n ) {
+    public static void printMatrix( Vector< Vector < Double > > m, String n ) {
         System.out.println( "--" + " Matrix " + n );
-        for ( int i = 0; i < m.size(); i++ ){
-            for (int j = 0; j < m.elementAt(i).size(); j++ ){
-                System.out.print( m.elementAt(i).elementAt(j) + "\t" );
+        // row
+        for ( int i = 0; i < m.elementAt(0).size(); i++ ){
+            System.out.println();
+            // col
+            for (int j = 0; j < m.size(); j++ ){
+
+                System.out.print( m.elementAt(j).elementAt(i) + "\t" );
+
             }
             System.out.println();
         }
