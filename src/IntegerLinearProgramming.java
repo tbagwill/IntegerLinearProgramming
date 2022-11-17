@@ -1,3 +1,4 @@
+import java.util.Random;
 import java.util.Vector;
 
 /* 
@@ -8,8 +9,8 @@ import java.util.Vector;
 
 public class IntegerLinearProgramming {
 
-    public static final Integer col = 3;
-    public static final Integer row = 3;
+    public static final Integer n = 4;
+
     public static Vector < Vector < Double > > x = new Vector < Vector < Double > > ();
 
     public static void main(String[] args) throws Exception {
@@ -28,7 +29,9 @@ public class IntegerLinearProgramming {
         Vector < Vector < Double > > s = new Vector < Vector < Double > > ();
 
         // Populate Matrices ( System of Equations )
-        pop(a, b, s);
+        pop(a, n, n);
+        pop(b, 1, n);
+        pop(s, 1, n);
 
         // check matrices
         printMatrix(a, "a");
@@ -57,11 +60,6 @@ public class IntegerLinearProgramming {
         x = multMatrix( inv, b );
 
         printMatrix(x, "x");
-
-        // TODO: inverse of the matrix using A^-1 = adjucate( A ) * ( 1 / determinate(A) )
-
-
-        // System.out.println(x.toString());
     }
 
     public static Vector < Vector < Double > > multMatrix( Vector < Vector < Double > > a, Vector < Vector < Double > > b ){
@@ -71,8 +69,6 @@ public class IntegerLinearProgramming {
         
         Vector < Vector < Double > > res = new Vector < Vector < Double > > ();
         double sum = 0.0;
-
-        // TODO: 3x3 * 3x1
 
         for( int i = 0; i < b.size(); i++ ){
             res.add( new Vector < Double > () );
@@ -116,18 +112,6 @@ public class IntegerLinearProgramming {
 
         printMatrix(inv, "inv of a");
 
-        // Vector < Double > dot = new Vector<Double>();
-
-        // double sum;
-        // for(int i = 0; i < inv.size(); i++) {
-        //     sum = 0;
-        //     for(int j = 0; j < inv.elementAt(i).size(); j++) {
-        //         sum += bs.elementAt(i).elementAt(j) * inv.elementAt(i).elementAt(j);
-        //     }
-        //     dot.add(sum);
-        // }
-        // System.out.println(dot);
-
         return inv;
     }
 
@@ -160,7 +144,7 @@ public class IntegerLinearProgramming {
             v2.elementAt( x ).removeElementAt( j );
         }
 
-        // remove col
+        // remove n
         v2.removeElementAt(i);
 
         // debug
@@ -232,14 +216,13 @@ public class IntegerLinearProgramming {
         return sum1 - sum2;
 
         } else {
-            // debug
-            // printMatrix(v2, "v");
-
+            // brute force
             return v2.elementAt(0).elementAt(0) * v2.elementAt(1).elementAt(1) - v2.elementAt(1).elementAt(0) * v2.elementAt(0).elementAt(1);
         }
     }
 
     public static Vector < Vector < Double > > transpose( Vector < Vector < Double > > v ){
+        // flip matrix
         Vector < Vector < Double > > v2 = new Vector < Vector < Double > > ();
 
         for( int i = 0; i < v.elementAt(0).size(); i++ ){
@@ -253,6 +236,7 @@ public class IntegerLinearProgramming {
     }
 
     public static Vector < Vector < Double > > copyMatrix( Vector < Vector < Double > > v ){
+        // duplicate
         Vector < Vector < Double > > copy = new Vector < Vector < Double > > ();
 
         for( int i = 0; i < v.size(); i++ ){
@@ -265,32 +249,37 @@ public class IntegerLinearProgramming {
         return copy;
     }
 
-    public static void pop( Vector < Vector < Double > > a, Vector < Vector < Double > > b, Vector < Vector < Double > > s ) {
-        // populate a
-        a.addElement( new Vector < Double > () );
-        a.addElement( new Vector < Double > () );
-        a.addElement( new Vector < Double > () );
-        a.elementAt(0).addElement(3.2);
-        a.elementAt(1).addElement(8.7);
-        a.elementAt(2).addElement(5.9);
-        a.elementAt(0).addElement(2.4);
-        a.elementAt(1).addElement(3.1);
-        a.elementAt(2).addElement(1.1);
-        a.elementAt(0).addElement(9.7);
-        a.elementAt(1).addElement(6.1);
-        a.elementAt(2).addElement(0.3);
+    public static void pop( Vector < Vector < Double > > a, int xsize, int ysize ) {
+        for( int i = 0; i < xsize; i++ ){
+            a.add( new Vector < Double > () );
+            for( int j = 0; j < ysize; j++ ){
+                a.elementAt(i).add( randNum() );
+            }
+        }
         
-        // populate b
-        b.addElement( new Vector < Double > () );
-        b.elementAt(0).addElement(5.0);
-        b.elementAt(0).addElement(12.9);
-        b.elementAt(0).addElement(2.0);
-        
-        // populate s
-        s.addElement( new Vector < Double > () );
-        s.elementAt(0).addElement(3.7);
-        s.elementAt(0).addElement(3.8);
-        s.elementAt(0).addElement(1.0);
+        // // populate a
+        // a.addElement( new Vector < Double > () );
+        // a.addElement( new Vector < Double > () );
+        // a.addElement( new Vector < Double > () );
+        // a.elementAt(0).addElement(3.2);
+        // a.elementAt(1).addElement(8.7);
+        // a.elementAt(2).addElement(5.9);
+        // a.elementAt(0).addElement(2.4);
+        // a.elementAt(1).addElement(3.1);
+        // a.elementAt(2).addElement(1.1);
+        // a.elementAt(0).addElement(9.7);
+        // a.elementAt(1).addElement(6.1);
+        // a.elementAt(2).addElement(0.3);
+        // // populate b
+        // b.addElement( new Vector < Double > () );
+        // b.elementAt(0).addElement(5.0);
+        // b.elementAt(0).addElement(12.9);
+        // b.elementAt(0).addElement(2.0);
+        // // populate s
+        // s.addElement( new Vector < Double > () );
+        // s.elementAt(0).addElement(3.7);
+        // s.elementAt(0).addElement(3.8);
+        // s.elementAt(0).addElement(1.0);
     }
 
     public static void printMatrix( Vector< Vector < Double > > m, String n ) {
@@ -298,7 +287,7 @@ public class IntegerLinearProgramming {
         // row
         for ( int i = 0; i < m.elementAt(0).size(); i++ ){
             System.out.println();
-            // col
+            // n
             for (int j = 0; j < m.size(); j++ ){
 
                 System.out.print( m.elementAt(j).elementAt(i) + "\t" );
@@ -308,5 +297,12 @@ public class IntegerLinearProgramming {
         }
         System.out.println();
     }    
+
+    public static Double randNum(){
+        Random r = new Random( System.currentTimeMillis() + System.nanoTime() );
+        Integer i = r.nextInt( 10 );
+        Double d = r.nextDouble();
+        return i + d;
+    }
 
 }
